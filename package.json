@@ -1,0 +1,21 @@
+{
+  "name": "customer-journey",
+  "version": "0.1.0",
+  "description": "Customer Journey example using HID Authentication",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "hid",
+    "authentication",
+    "idv",
+    "rms"
+  ],
+  "author": "Adrian Castillo <acastillo@hidglobal.com>",
+  "license": "MIT",
+  "dependencies": {
+    "dotenv": "^16.0.3",
+    "express": "^4.18.2"
+  }
+}
