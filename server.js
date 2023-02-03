@@ -11,7 +11,7 @@ app.use(express.json());
 app.use(express.static('public'));
 
 app.post('/register', (req, res) => {
-  console.log(req.body);
+  console.log('Starting registration for ' + JSON.stringify(req.body));
   fetch(process.env.IDV_ENDPOINT + '/api/login', {
     method: 'POST',
     headers: {
@@ -25,7 +25,7 @@ app.post('/register', (req, res) => {
     .then((response) => response.json())
     .then((data) => {
       let access_token = data.jwt;
-      console.log('access_token = ' + access_token);
+      console.log('We have an access token: ' + (access_token !== undefined))
       fetch(process.env.IDV_ENDPOINT + '/api/verify', {
         method: 'POST',
         headers: {
@@ -35,20 +35,20 @@ app.post('/register', (req, res) => {
         body: JSON.stringify({
           channel: 'URL',
           channelConfiguration: {
+            requestExpiryTimeInMin: 1440,
+            transactionExpiryTimeInIm: 1440,
+            transactionAttempts: 3,
+            frontCaptureAttempt: 3,
+            backCaptureAttempt: 3,
             frontCaptureMode: 'Auto',
+            frontOverlayTextAuto: 'Alinéa tu credential y sosténla en el recuadro',
             backCaptureMode: 'Auto',
             selfieCaptureMode: 'Auto',
             enableSelfieCapture: true,
             enableFarSelfie: false,
-            transactionAttempts: 3,
-            frontCaptureAttempt: 3,
-            backCaptureAttempt: 3,
             enableLocationDetection: true,
-            requestExpiryTimeInMin: 1440,
-            transactionExpiryTimeInIm: 1440
-          },
-          transactionDetails: {
-            accountCode: '123456'
+            backIsBarcodeDetectedEnabled: false,
+            customColor: '#FF0000'
           },
           channelResponse: [
             'AddressCity',
@@ -62,7 +62,12 @@ app.post('/register', (req, res) => {
             'HidePassIDEThreshold',
             'HideFailIDEThreshold',
             'HideUncertainIDEThreshold'
-          ]
+          ],
+          transactionDetails: {
+            accountCode: '123456'
+          },
+          postbackURL: process.env.BASE_URL + '/postback',
+          redirectURL: process.env.BASE_URL + '/continue'
         })
       })
         .then((response) => response.json())
@@ -72,9 +77,14 @@ app.post('/register', (req, res) => {
     });
 });
 
-app.post('/onboard', (req, res) => {
-  console.log(req.body);
+app.post('/postback', (req, res) => {
+  console.log('Posted back:\n' + JSON.stringify(req.body, null, 2));
   res.status(200).send('Welcome');
+});
+
+app.get('/continue', (req, res) => {
+  console.log('Continue after IDV');
+  res.send('<h1>Great</h1><p>Thanks for your submission</p>')
 });
 
 app.get('/*', (req, res) => {
