@@ -6,8 +6,8 @@ require('dotenv').config();
 const app = express();
 const port = process.env.PORT || 3000;
 
-app.use(express.urlencoded({ extended: true, limit: '50mb' }));
-app.use(express.json({ limit: '50mb' }));
+app.use(express.urlencoded({ extended: true, limit: '10mb' }));
+app.use(express.json({ limit: '10mb' }));
 app.use(express.static('public'));
 
 app.post('/register', (req, res) => {
@@ -45,8 +45,8 @@ app.post('/register', (req, res) => {
             frontCaptureAttempt: 3,
             backCaptureAttempt: 3,
             frontCaptureMode: 'Auto',
-            frontOverlayTextAuto: 'Alin&eacute;a tu credential y sost&eacute;nla en el recuadro',
             backCaptureMode: 'Auto',
+            backOverlayTextAuto: 'Align the back of your ID with the frame&#10;and wait for the scan to complete.',
             selfieCaptureMode: 'Auto',
             enableSelfieCapture: true,
             enableFarSelfie: false,
@@ -55,13 +55,13 @@ app.post('/register', (req, res) => {
             customColor: '#FF0000'
           },
           channelResponse: [
-            'AddressCity',
-            'AddressPostalCode',
-            'BirthDate',
-            'DocumentNumber',
-            'PIISource',
-            'SELFIE_MATCHSCORE',
-            'IMAGE_SELFIE',
+            'DQL_Classification_DocumentIssuerCountryCode',
+            'DQL_Classification_DocumentName',
+            'DQL_Final_DocumentNumber_Result',
+            'DQL_Final_ExpirationDate_Result',
+            'DQL_Final_FirstName_Result',
+            'DQL_Final_Surname_Result',
+            'ImageSelfie',
             'HideTransactionDetails',
             'HidePassIDEThreshold',
             'HideFailIDEThreshold',
@@ -83,13 +83,17 @@ app.post('/register', (req, res) => {
 });
 
 app.post('/postback', (req, res) => {
-  console.log('Posted back:\n' + JSON.stringify(Object.keys(req.body)));
+  console.log('Update for request ' + req.body.requestID + ' (' + req.body.requestStatus + ')');
+  req.body.transactions.forEach((transaction) => {
+    console.log(`  Seq: ${transaction.sequenceNumber} - ${transaction.transactionStatus}`);
+    console.log(`  pii: ${JSON.stringify(Object.keys(transaction.pii))}`);
+  });
   res.send('OK');
 });
 
 app.get('/continue', (req, res) => {
   console.log('Continue after IDV');
-  res.send('<h1>Great</h1><p>Thanks for your submission</p>')
+  res.send('<html><head><link rel="stylesheet" href="/css/styles.css"></head><body><h1>Complete</h1><p>Thanks for your submission</p></body></html>')
 });
 
 app.get('/*', (req, res) => {
