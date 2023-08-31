@@ -6,8 +6,8 @@ require('dotenv').config();
 const app = express();
 const port = process.env.PORT || 3000;
 
-app.use(express.urlencoded());
-app.use(express.json());
+app.use(express.urlencoded({ extended: true, limit: '50mb' }));
+app.use(express.json({ limit: '50mb' }));
 app.use(express.static('public'));
 
 app.post('/register', (req, res) => {
@@ -25,7 +25,11 @@ app.post('/register', (req, res) => {
     .then((response) => response.json())
     .then((data) => {
       let access_token = data.jwt;
-      console.log('We have an access token: ' + (access_token !== undefined))
+      if (typeof(access_token) === 'undefined') {
+        console.log('Error: ' + JSON.stringify(data));
+        res.status(500).send('Server is not configured correctly');
+        return;
+      }
       fetch(process.env.IDV_ENDPOINT + '/api/verify', {
         method: 'POST',
         headers: {
@@ -41,7 +45,7 @@ app.post('/register', (req, res) => {
             frontCaptureAttempt: 3,
             backCaptureAttempt: 3,
             frontCaptureMode: 'Auto',
-            frontOverlayTextAuto: 'Alinéa tu credential y sosténla en el recuadro',
+            frontOverlayTextAuto: 'Alin&eacute;a tu credential y sost&eacute;nla en el recuadro',
             backCaptureMode: 'Auto',
             selfieCaptureMode: 'Auto',
             enableSelfieCapture: true,
@@ -64,7 +68,7 @@ app.post('/register', (req, res) => {
             'HideUncertainIDEThreshold'
           ],
           transactionDetails: {
-            accountCode: '123456'
+            accountCode: '9999'
           },
           postbackURL: process.env.BASE_URL + '/postback',
           redirectURL: process.env.BASE_URL + '/continue'
@@ -72,14 +76,15 @@ app.post('/register', (req, res) => {
       })
         .then((response) => response.json())
         .then((data) => {
-          res.redirect(301, data.url)
+          console.log(`Redirecting request ${data.requestID}`)
+          res.redirect(302, data.url)
         })
     });
 });
 
 app.post('/postback', (req, res) => {
-  console.log('Posted back:\n' + JSON.stringify(req.body, null, 2));
-  res.status(200).send('Welcome');
+  console.log('Posted back:\n' + JSON.stringify(Object.keys(req.body)));
+  res.send('OK');
 });
 
 app.get('/continue', (req, res) => {
