@@ -1,6 +1,7 @@
 const express = require('express');
-const { access } = require('fs');
 const path = require('path');
+const ua_parser = require('ua-parser-js');
+const qr = require('qrcode');
 require('dotenv').config();
 
 const app = express();
@@ -77,7 +78,14 @@ app.post('/register', (req, res) => {
         .then((response) => response.json())
         .then((data) => {
           console.log(`Redirecting request ${data.requestID}`)
-          res.redirect(302, data.url)
+          let ua = ua_parser(req.headers['user-agent']);
+          if (ua.device.type !== 'mobile') {
+            qr.toDataURL(data.url, { errorCorrectionLevel: 'H' }, (err, url) => {
+              res.send(`<html><head><link rel="stylesheet" href="/css/styles.css"></head><body><h2>Register</h2><p>Scan the QR code with your mobile device to continue</p><img src="${url}"></body></html>`);
+            });
+          } else {
+            res.redirect(302, data.url);
+          }
         })
     });
 });
@@ -93,7 +101,7 @@ app.post('/postback', (req, res) => {
 
 app.get('/continue', (req, res) => {
   console.log('Continue after IDV');
-  res.send('<html><head><link rel="stylesheet" href="/css/styles.css"></head><body><h1>Complete</h1><p>Thanks for your submission</p></body></html>')
+  res.send('<html><head><link rel="stylesheet" href="/css/styles.css"></head><body><h2>Complete</h2><p>Thanks for your submission</p></body></html>')
 });
 
 app.get('/*', (req, res) => {
