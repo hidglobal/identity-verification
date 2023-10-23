@@ -13,14 +13,16 @@ app.use(express.static('public'));
 
 app.post('/register', (req, res) => {
   console.log('Starting registration for ' + JSON.stringify(req.body));
+  const accountCode = req.body.account || '9999';
+  console.log(accountCode);
   fetch(process.env.IDV_ENDPOINT + '/api/login', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json'
     },
     body: JSON.stringify({
-      username: process.env.IDV_CLIENT_ID,
-      password: process.env.IDV_CLIENT_SECRET
+      username: accountCode === '9999' ? process.env.IDV_CLIENT_ID : process.env.IDV_TCUSTF_ID,
+      password: accountCode === '9999' ? process.env.IDV_CLIENT_SECRET : process.env.IDV_TCUSTF_SECRET
     })
   })
     .then((response) => response.json())
@@ -69,7 +71,7 @@ app.post('/register', (req, res) => {
             'HideUncertainIDEThreshold'
           ],
           transactionDetails: {
-            accountCode: '9999'
+            accountCode: accountCode
           },
           postbackURL: process.env.BASE_URL + '/postback',
           redirectURL: process.env.BASE_URL + '/continue'
@@ -101,6 +103,7 @@ app.post('/postback', (req, res) => {
 
 app.get('/continue', (req, res) => {
   console.log('Continue after IDV');
+  console.log(req.body);
   res.send('<html><head><link rel="stylesheet" href="/css/styles.css"></head><body><h2>Complete</h2><p>Thanks for your submission</p></body></html>')
 });
 

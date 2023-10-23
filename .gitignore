@@ -3,3 +3,4 @@
 **/.DS_Store
 fly.toml
 Dockerfile
+/config
