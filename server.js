@@ -14,15 +14,27 @@ app.use(express.static('public'));
 app.post('/register', (req, res) => {
   console.log('Starting registration for ' + JSON.stringify(req.body));
   const accountCode = req.body.account || '9999';
-  console.log(accountCode);
+  let environment = '';
+  switch (accountCode.substring(0, 1)) {
+    case '1':
+      environment = 'TEST';
+      break;
+    case '9':
+      environment = 'PRESALES';
+      break;
+    default:
+      environment = 'TCUSTF';
+      break;
+  }
+  console.log(`Using ${environment} environment`);
   fetch(process.env.IDV_ENDPOINT + '/api/login', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json'
     },
     body: JSON.stringify({
-      username: accountCode === '9999' ? process.env.IDV_CLIENT_ID : process.env.IDV_TCUSTF_ID,
-      password: accountCode === '9999' ? process.env.IDV_CLIENT_SECRET : process.env.IDV_TCUSTF_SECRET
+      username: process.env[`IDV_${environment}_ID`],
+      password: process.env[`IDV_${environment}_SECRET`]
     })
   })
     .then((response) => response.json())
