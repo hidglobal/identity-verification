@@ -8,18 +8,28 @@
   <title>HID Identity Verification</title>
   <link rel="stylesheet" href="/css/styles.css">
 </head>
-
 <body>
   <div class="page page--full-width">
     <main class="page__content">
       <div class="region region--content">
         <section class="section section--layout-onecol">
           <h2>Digital Identity Verification</h2>
-          <p>The HID Identity Verification Solution is a robust, out-of-the-box solution for banks and financial services providers to ensure a smooth digital onboarding for their consumers.</p>
-          <p>When you are ready, start your user journey with Identity Verification</p>
+          <p>The HID <a href="https://www.hidglobal.com/solutions/digital-identity-verification">Identity Verification Solution</a> is a robust, out-of-the-box solution for banks and financial services providers to ensure a smooth digital onboarding for their consumers.</p>
+          <p>This Web page shows an example of how the solution would be integrated in your onboarding flow. Your customer will go through the following steps:</p>
+          <ol class="list-plain">
+            <li>They start in your Web site or mobile application (this page) where you give them information so they decide to go ahead and start the identity verification process</li>
+            <li>You can ask for some details to start the process. In this example there is a code that corresponds to a test environment that you may have setup with your HID Presales Engineer. If you have no specific code, leave it blank to use the default account</li>
+            <li>The user is taken to a unique page where they will be guided by the HID Identity Verification solution to submit their document and take a selfie. The look and feel of that process can be customized as part of your deployment in production</li>
+            <li>The HID Identity Verification Solution will run validation checks on the document and selfie and give back the results to your application. The user is then sent back to your application to continue onboarding</li>
+            <li>Your application can then use those results to continue the process, for this demonstration, you will see the photo and basic document information. During deployment in production you can customize the shape of that response to adapt to your business needs</li>
+            <li>The HID Identity Verification Solution allows you to configure the data retention to suit your business needs, all your submissions to this example are automatically deleted from our servers after one hour</li>
+          </ol>
           <form action="/register" method="POST">
-            <label for="account">Custom Account (optional)</label>
-            <input type="text" name="account" placeholder="9999">
+            <div class="form-item form-item-name">
+              <label class="form-required" for="account">Custom Account (optional)</label>
+              <input class="form-text" type="text" name="account" placeholder="9999">
+              <div class="description">Leave blank if you have not received a specific account code from your HID Presales Engineer</div>
+            </div>
             <input type="submit" value="Start" />
           </form>
         </section>
